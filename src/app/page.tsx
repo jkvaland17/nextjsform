@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -77,6 +77,7 @@ const Home = () => {
     handleSubmit,
     formState: { errors },
     reset,
+	control,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -187,9 +188,7 @@ const Home = () => {
 			{/* Upload Button */}
 			<label htmlFor="image-upload">
 			<div
-				size="icon"
 				className="absolute bottom-0 right-0 rounded-full h-8 w-8 cursor-pointer bg-white	-500 shadow-md flex items-center justify-center"
-				variant="default"
 				onClick={openFilePicker} 
 			>
 				<Pencil className="h-4 w-4" />
@@ -236,24 +235,37 @@ const Home = () => {
 			</div>
 
 			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Dept./Organization</label>
-			
-				<Select defaultValue="health" {...register("department")}   className={`w-full ${errors.department ? "border-red-500" : ""}`}>
-					<SelectTrigger>
-					<SelectValue placeholder="Select department" />
-					</SelectTrigger>
-					<SelectContent>
-					<SelectItem value="health">Health</SelectItem>
-					<SelectItem value="hr">HR</SelectItem>
-					<SelectItem value="it">IT</SelectItem>
-					</SelectContent>
-				</Select>
-				{errors.department && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.department.message}
-				</p>
-				)}
-			</div>
+  <label className="text-lg font-bold text-gray-800">Dept./Organization</label>
+  
+  <Controller
+    name="department"
+    control={control}
+    defaultValue="health"
+    render={({ field }) => (
+      <Select
+        {...field}
+        onValueChange={field.onChange}
+        className={`w-full border border-gray-300 rounded-[10px] text-gray-700 ${
+          errors.department ? "border-red-500" : ""
+        }`}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select department" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="health">Health</SelectItem>
+          <SelectItem value="hr">HR</SelectItem>
+          <SelectItem value="it">IT</SelectItem>
+        </SelectContent>
+      </Select>
+    )}
+  />
+  
+  {errors.department && (
+    <p className="text-red-500 text-sm mt-1">{errors.department.message}</p>
+  )}
+</div>
+
 
 			<div className="space-y-2">
 				<label className="text-lg    text-gray-800">Email</label>
