@@ -28,10 +28,8 @@ const profileSchema = z.object({
     .string()
     .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
   alternativeNumber: z
-    .string()
-    .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number")
-    .optional()
-    .or(z.literal("")),
+  .string()
+  .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
   dateOfBirth: z
     .string()
     .min(1, "Date of birth is required")
@@ -168,7 +166,7 @@ const Home = () => {
             </div>
             <label
               htmlFor="image-upload"
-              className="absolute -bottom-2 -right-2 bg-blue-500 p-2 rounded-full cursor-pointer"
+              className="absolute bottom-2 right-2 bg-blue-500 p-2 rounded-full cursor-pointer"
             >
               <svg
                 className="w-4 h-4 text-white"
