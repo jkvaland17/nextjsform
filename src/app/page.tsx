@@ -6,13 +6,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Pencil } from "lucide-react";
 
-// Validation schema
 const profileSchema = z.object({
   name: z
     .string()
@@ -31,16 +36,9 @@ const profileSchema = z.object({
     .string()
     .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
   alternativeNumber: z
-  .string()
-  .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
-  dateOfBirth: z
     .string()
-    .min(1, "Date of birth is required")
-    .refine((date) => {
-      const eighteenYearsAgo = new Date();
-      eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18);
-      return new Date(date) <= eighteenYearsAgo;
-    }, "You must be at least 18 years old"),
+    .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
   presentAddress: z
     .string()
     .min(5, "Present address must be at least 5 characters")
@@ -70,14 +68,13 @@ const Home = () => {
   );
   const [activeTab, setActiveTab] = useState("profile");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef(null);  
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-	control,
+    control,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -100,12 +97,12 @@ const Home = () => {
     try {
       setIsSubmitting(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-	  const formData = {
-		...data,
-		profileImage, // Add the image URL/base64 string here
-	  };
-	  console.log(formData);
+
+      const formData = {
+        ...data,
+        profileImage,
+      };
+      console.log(formData);
       alert("Profile updated successfully!");
       reset();
     } catch (error) {
@@ -113,12 +110,6 @@ const Home = () => {
       alert("Error updating profile. Please try again.");
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const openFilePicker = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click(); // Programmatically open file input
     }
   };
 
@@ -144,295 +135,314 @@ const Home = () => {
   };
 
   return (
-   <div className="max-w-4xl mx-auto p-6">
-	<Tabs value={activeTab}   onValueChange={setActiveTab} >
-
-	<div className="flex space-x-8 border-b mb-8">
-        <button
-          className={`pb-2 px-4 ${
-            activeTab === "profile"
-              ? "border-b-2 border-blue-500 text-blue-500"
-              : ""
-          }`}
-          onClick={() => setActiveTab("profile")}
-        >
-          Edit Profile
-        </button>
-        <button
-          className={`pb-2 px-4 ${
-            activeTab === "security"
-              ? "border-b-2 border-blue-500 text-blue-500"
-              : ""
-          }`}
-          onClick={() => setActiveTab("security")}
-        >
-          Security
-        </button>
-      </div>
-
-
-
-	  
-
-	  
-	  <TabsContent value="profile" className="space-y-8">
-	  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-		{/* */}
-
-			<div className="flex items-center gap-6">
-          <div className="relative">
-            <div className="w-32 h-32 rounded-full overflow-hidden">
-			<Avatar className="h-32 w-32">
-			<AvatarImage
-				src={
-				profileImage ||
-				"https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop"
-				}
-			/>
-			<AvatarFallback>CR</AvatarFallback>
-			</Avatar>
-            </div>
-            <label
-              htmlFor="image-upload"
-              className="absolute -bottom-2 -right-2 bg-blue-500 p-2 rounded-full cursor-pointer"
-            >
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </label>
-            <input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-            />
-          </div>
+    <div className="max-w-4xl mx-auto p-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="flex space-x-8 border-b mb-8">
+          <button
+            className={`pb-2 px-4 ${
+              activeTab === "profile"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : ""
+            }`}
+            onClick={() => setActiveTab("profile")}
+          >
+            Edit Profile
+          </button>
+          <button
+            className={`pb-2 px-4 ${
+              activeTab === "security"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : ""
+            }`}
+            onClick={() => setActiveTab("security")}
+          >
+            Security
+          </button>
         </div>
 
-			<div className="grid grid-cols-2 gap-6">
-			<div className="space-y-2">
-				<label className="text-lg  text-lg    text-gray-700">Your Name</label>
-				<Input
-				{...register("name")}
-				placeholder="Your Name"
-				className={`w-full ${errors.name ? "border-red-500 " : ""}`}
-				/>
-				{errors.name && (
-				<p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-				)}
-			</div>
+        <TabsContent value="profile" className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* */}
 
-			<div className="space-y-2">
-				<label className="text-lg  text-lg    text-gray-700">Designation</label>
-				<Input
-				{...register("designation")}
-				placeholder="Designation"
-				className={`w-full ${errors.designation ? "border-red-500" : ""}`}
-				/>
-				{errors.designation && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.designation.message}
-				</p>
-				)}
-			</div>
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-full overflow-hidden">
+                  <Avatar className="h-32 w-32">
+                    <AvatarImage
+                      src={
+                        profileImage ||
+                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop"
+                      }
+                    />
+                    <AvatarFallback>CR</AvatarFallback>
+                  </Avatar>
+                </div>
+                <label
+                  htmlFor="image-upload"
+                  className="absolute -bottom-2 -right-2 bg-blue-500 p-2 rounded-full cursor-pointer"
+                >
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                </label>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </div>
+            </div>
 
-			<div className="space-y-2">
-  <label className="text-lg font-bold text-gray-800">Dept./Organization</label>
-  
-  <Controller
-    name="department"
-    control={control}
-    defaultValue="health"
-    render={({ field }) => (
-      <Select
-        {...field}
-        onValueChange={field.onChange}
-        className={`w-full border border-gray-300 rounded-[10px] text-gray-700 ${
-          errors.department ? "border-red-500" : ""
-        }`}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select department" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="health">Health</SelectItem>
-          <SelectItem value="hr">HR</SelectItem>
-          <SelectItem value="it">IT</SelectItem>
-        </SelectContent>
-      </Select>
-    )}
-  />
-  
-  {errors.department && (
-    <p className="text-red-500 text-sm mt-1">{errors.department.message}</p>
-  )}
-</div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-lg  text-lg    text-gray-700">
+                  Your Name
+                </label>
+                <Input
+                  {...register("name")}
+                  placeholder="Your Name"
+                  className={`w-full ${errors.name ? "border-red-500 " : ""}`}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
 
+              <div className="space-y-2">
+                <label className="text-lg  text-lg    text-gray-700">
+                  Designation
+                </label>
+                <Input
+                  {...register("designation")}
+                  placeholder="Designation"
+                  className={`w-full ${
+                    errors.designation ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.designation && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.designation.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Email</label>
-				<Input
-				{...register("email")}
-				type="email"
-				placeholder="Email"
-				className={`w-full ${errors.email ? "border-red-500" : ""}`}
-				/>
-				{errors.email && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.email.message}
-				</p>
-				)}
-			</div>
+              <div className="space-y-2">
+                <label className="text-lg text-gray-800">
+                  Dept./Organization
+                </label>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Mobile Number</label>
-				<Input
-				{...register("mobileNumber")}
-				placeholder="Mobile Number"
-				className={`w-full ${
-					errors.mobileNumber ? "border-red-500" : ""
-				}`}
-				/>
-				{errors.mobileNumber && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.mobileNumber.message}
-				</p>
-				)}
-			</div>
+                <Controller
+                  name="department"
+                  control={control}
+                  defaultValue="health"
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onValueChange={field.onChange}
+                      className={`w-full border border-gray-300 rounded-[10px] text-gray-700 ${
+                        errors.department ? "border-red-500" : ""
+                      }`}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="health">Health</SelectItem>
+                        <SelectItem value="hr">HR</SelectItem>
+                        <SelectItem value="it">IT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Alternative Number</label>
-				<Input
-				{...register("alternativeNumber")}
-				placeholder="Alternative Number"
-				className={`w-full ${
-					errors.alternativeNumber ? "border-red-500" : ""
-				}`}
-				/>
-				{errors.alternativeNumber && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.alternativeNumber.message}
-				</p>
-				)}
-			</div>
+                {errors.department && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.department.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Date of Birth</label>
-				<Input
-				{...register("dateOfBirth")}
-				type="date"
-				className={`w-full ${errors.dateOfBirth ? "border-red-500" : ""}`}
-				/>
-				{errors.dateOfBirth && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.dateOfBirth.message}
-				</p>
-				)}
-			</div>
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">Email</label>
+                <Input
+                  {...register("email")}
+                  type="email"
+                  placeholder="Email"
+                  className={`w-full ${errors.email ? "border-red-500" : ""}`}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Present Address</label>
-				<Input
-				{...register("presentAddress")}
-				placeholder="Present Address"
-				className={`w-full ${
-					errors.presentAddress ? "border-red-500" : ""
-				}`}
-				/>
-				{errors.presentAddress && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.presentAddress.message}
-				</p>
-				)}
-			</div>
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">
+                  Mobile Number
+                </label>
+                <Input
+                  {...register("mobileNumber")}
+                  placeholder="Mobile Number"
+                  className={`w-full ${
+                    errors.mobileNumber ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.mobileNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.mobileNumber.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Permanent Address</label>
-				<Input
-				{...register("permanentAddress")}
-				placeholder="Permanent Address"
-				className={`w-full ${
-					errors.permanentAddress ? "border-red-500" : ""
-				}`}
-				/>
-				{errors.permanentAddress && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.permanentAddress.message}
-				</p>
-				)}
-			</div>
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">
+                  Alternative Number
+                </label>
+                <Input
+                  {...register("alternativeNumber")}
+                  placeholder="Alternative Number"
+                  className={`w-full ${
+                    errors.alternativeNumber ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.alternativeNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.alternativeNumber.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">City</label>
-				<Input
-				{...register("city")}
-				placeholder="City"
-				className={`w-full ${errors.city ? "border-red-500" : ""}`}
-				/>
-				{errors.city && (
-				<p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
-				)}
-			</div>
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">
+                  Date of Birth
+                </label>
+                <Input
+                  {...register("dateOfBirth")}
+                  type="date"
+                  className={`w-full ${
+                    errors.dateOfBirth ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.dateOfBirth && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.dateOfBirth.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Postal Code</label>
-				<Input
-				{...register("postalCode")}
-				placeholder="Postal Code"
-				className={`w-full ${errors.postalCode ? "border-red-500" : ""}`}
-				/>
-				{errors.postalCode && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.postalCode.message}
-				</p>
-				)}
-			</div>
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">
+                  Present Address
+                </label>
+                <Input
+                  {...register("presentAddress")}
+                  placeholder="Present Address"
+                  className={`w-full ${
+                    errors.presentAddress ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.presentAddress && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.presentAddress.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="space-y-2">
-				<label className="text-lg    text-gray-800">Country</label>
-				<Input
-				{...register("country")}
-				placeholder="Country"
-				className={`w-full ${errors.country ? "border-red-500" : ""}`}
-				/>
-				{errors.country && (
-				<p className="text-red-500 text-sm mt-1">
-					{errors.country.message}
-				</p>
-				)}
-			</div>
-			</div>
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">
+                  Permanent Address
+                </label>
+                <Input
+                  {...register("permanentAddress")}
+                  placeholder="Permanent Address"
+                  className={`w-full ${
+                    errors.permanentAddress ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.permanentAddress && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.permanentAddress.message}
+                  </p>
+                )}
+              </div>
 
-			<div className="flex justify-end">
-			<Button
-				type="submit"
-				className="bg-blue-500 text-white px-8"
-				disabled={isSubmitting}
-			>
-				{isSubmitting ? "Saving..." : "Save"}
-			</Button>
-			</div>
-		</form>
-	  </TabsContent>
-	  <TabsContent value="security">
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">City</label>
+                <Input
+                  {...register("city")}
+                  placeholder="City"
+                  className={`w-full ${errors.city ? "border-red-500" : ""}`}
+                />
+                {errors.city && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.city.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">Postal Code</label>
+                <Input
+                  {...register("postalCode")}
+                  placeholder="Postal Code"
+                  className={`w-full ${
+                    errors.postalCode ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.postalCode && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.postalCode.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-lg    text-gray-800">Country</label>
+                <Input
+                  {...register("country")}
+                  placeholder="Country"
+                  className={`w-full ${errors.country ? "border-red-500" : ""}`}
+                />
+                {errors.country && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.country.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                className="bg-blue-500 text-white px-8"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </TabsContent>
+        <TabsContent value="security">
           <div className="text-center py-8 text-muted-foreground">
             Security settings will be displayed here
           </div>
         </TabsContent>
-	</Tabs>
-    
-		
+      </Tabs>
     </div>
   );
 };
