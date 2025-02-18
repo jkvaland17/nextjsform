@@ -100,7 +100,12 @@ const Home = () => {
     try {
       setIsSubmitting(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(data);
+    
+	  const formData = {
+		...data,
+		profileImage, // Add the image URL/base64 string here
+	  };
+	  console.log(formData);
       alert("Profile updated successfully!");
       reset();
     } catch (error) {
@@ -172,9 +177,11 @@ const Home = () => {
 	  
 	  <TabsContent value="profile" className="space-y-8">
 	  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-		<div className="flex items-center gap-6">
-			<div className="relative">
-			{/* Avatar Component */}
+		{/* */}
+
+			<div className="flex items-center gap-6">
+          <div className="relative">
+            <div className="w-32 h-32 rounded-full overflow-hidden">
 			<Avatar className="h-32 w-32">
 			<AvatarImage
 				src={
@@ -184,28 +191,34 @@ const Home = () => {
 			/>
 			<AvatarFallback>CR</AvatarFallback>
 			</Avatar>
-
-			{/* Upload Button */}
-			<label htmlFor="image-upload">
-			<div
-				className="absolute bottom-0 right-0 rounded-full h-8 w-8 cursor-pointer bg-white	-500 shadow-md flex items-center justify-center"
-				onClick={openFilePicker} 
-			>
-				<Pencil className="h-4 w-4" />
-			</div>
-			</label>
-
-			{/* Hidden File Input */}
-			<input
-			ref={fileInputRef} 
-			id="image-upload"
-			type="file"
-			accept="image/*"
-			className="hidden"
-			onChange={handleImageUpload}
-			/>
-		</div>
-			</div>
+            </div>
+            <label
+              htmlFor="image-upload"
+              className="absolute -bottom-2 -right-2 bg-blue-500 p-2 rounded-full cursor-pointer"
+            >
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </label>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageUpload}
+            />
+          </div>
+        </div>
 
 			<div className="grid grid-cols-2 gap-6">
 			<div className="space-y-2">
