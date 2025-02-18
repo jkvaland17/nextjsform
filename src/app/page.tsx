@@ -31,10 +31,8 @@ const profileSchema = z.object({
     .string()
     .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
   alternativeNumber: z
-    .string()
-    .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number")
-    .optional()
-    .or(z.literal("")),
+  .string()
+  .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
   dateOfBirth: z
     .string()
     .min(1, "Date of birth is required")
