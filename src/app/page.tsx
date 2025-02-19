@@ -1,7 +1,5 @@
 "use client";
-
 import { useForm, Controller } from "react-hook-form";
-import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input } from "@/components/ui/input";
@@ -13,53 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Pencil } from "lucide-react";
-
-const profileSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be less than 50 characters"),
-  designation: z
-    .string()
-    .min(2, "Designation must be at least 2 characters")
-    .max(50, "Designation must be less than 50 characters"),
-  department: z.string().min(1, "Please select a department"),
-  email: z
-    .string()
-    .email("Please enter a valid email")
-    .min(1, "Email is required"),
-  mobileNumber: z
-    .string()
-    .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
-  alternativeNumber: z
-    .string()
-    .regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  presentAddress: z
-    .string()
-    .min(5, "Present address must be at least 5 characters")
-    .max(100, "Present address must be less than 100 characters"),
-  permanentAddress: z
-    .string()
-    .min(5, "Permanent address must be at least 5 characters")
-    .max(100, "Permanent address must be less than 100 characters"),
-  city: z
-    .string()
-    .min(2, "City must be at least 2 characters")
-    .max(50, "City must be less than 50 characters"),
-  postalCode: z
-    .string()
-    .regex(/^\d{5}(-\d{4})?$/, "Please enter a valid postal code"),
-  country: z
-    .string()
-    .min(2, "Country must be at least 2 characters")
-    .max(50, "Country must be less than 50 characters"),
-});
-
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { profileSchema } from "@/validations/add-profile-validation.schema";
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 const Home = () => {
@@ -78,18 +33,22 @@ const Home = () => {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "",
-      designation: "",
-      department: "",
-      email: "",
-      mobileNumber: "",
-      alternativeNumber: "",
-      dateOfBirth: "",
-      presentAddress: "",
-      permanentAddress: "",
-      city: "",
-      postalCode: "",
-      country: "",
+      editSection: {
+        name: "",
+        designation: "",
+        mobileNumber: "",
+        alternativeNumber: "",
+        dateOfBirth: "",
+        presentAddress: "",
+        permanentAddress: "",
+        city: "",
+        postalCode: "",
+        country: "",
+      },
+      detailSection: {
+        department: "",
+        email: "",
+      },
     },
   });
 
@@ -103,8 +62,9 @@ const Home = () => {
         profileImage,
       };
       console.log(formData);
-      alert("Profile updated successfully!");
+      alert("Profile updated successfully");
       reset();
+      setProfileImage("/api/placeholder/150/150");
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Error updating profile. Please try again.");
@@ -162,8 +122,6 @@ const Home = () => {
 
         <TabsContent value="profile" className="space-y-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* */}
-
             <div className="flex items-center gap-6">
               <div className="relative">
                 <div className="w-32 h-32 rounded-full overflow-hidden">
@@ -204,57 +162,53 @@ const Home = () => {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-lg  text-lg    text-gray-700">
-                  Your Name
-                </label>
+                <label className="text-lg text-gray-700">Your Name</label>
                 <Input
-                  {...register("name")}
+                  {...register("editSection.name")}
                   placeholder="Your Name"
-                  className={`w-full ${errors.name ? "border-red-500 " : ""}`}
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-lg  text-lg    text-gray-700">
-                  Designation
-                </label>
-                <Input
-                  {...register("designation")}
-                  placeholder="Designation"
                   className={`w-full ${
-                    errors.designation ? "border-red-500" : ""
+                    errors?.editSection?.name ? "border-red-500" : ""
                   }`}
                 />
-                {errors.designation && (
+                {errors?.editSection?.name && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.designation.message}
+                    {errors.editSection.name.message}
                   </p>
                 )}
               </div>
-
+              <div className="space-y-2">
+                <label className="text-lg text-gray-700">Designation</label>
+                <Input
+                  {...register("editSection.designation")}
+                  placeholder="Designation"
+                  className={`w-full ${
+                    errors?.editSection?.designation ? "border-red-500" : ""
+                  }`}
+                />
+                {errors?.editSection?.designation && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.editSection.designation.message}
+                  </p>
+                )}
+              </div>
               <div className="space-y-2">
                 <label className="text-lg text-gray-800">
                   Dept./Organization
                 </label>
-
                 <Controller
-                  name="department"
+                  name="detailSection.department"
                   control={control}
-                  defaultValue="health"
+                  defaultValue=""
                   render={({ field }) => (
                     <Select
                       {...field}
                       onValueChange={field.onChange}
-                      className={`w-full border border-gray-300 rounded-[10px] text-gray-700 ${
-                        errors.department ? "border-red-500" : ""
+                      className={`w-full border-gray-300 rounded-[10px] text-gray-700 ${
+                        errors?.detailSection?.department
+                          ? "border-red-500"
+                          : ""
                       }`}
                     >
                       <SelectTrigger>
@@ -268,164 +222,157 @@ const Home = () => {
                     </Select>
                   )}
                 />
-
-                {errors.department && (
+                {errors?.detailSection?.department && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.department.message}
+                    {errors.detailSection.department.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">Email</label>
+                <label className="text-lg text-gray-800">Email</label>
                 <Input
-                  {...register("email")}
+                  {...register("detailSection.email")}
                   type="email"
                   placeholder="Email"
-                  className={`w-full ${errors.email ? "border-red-500" : ""}`}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-lg    text-gray-800">
-                  Mobile Number
-                </label>
-                <Input
-                  {...register("mobileNumber")}
-                  placeholder="Mobile Number"
                   className={`w-full ${
-                    errors.mobileNumber ? "border-red-500" : ""
+                    errors?.detailSection?.email ? "border-red-500" : ""
                   }`}
                 />
-                {errors.mobileNumber && (
+                {errors?.detailSection?.email && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.mobileNumber.message}
+                    {errors.detailSection.email.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">
+                <label className="text-lg text-gray-800">Mobile Number</label>
+                <Input
+                  {...register("editSection.mobileNumber")}
+                  placeholder="Mobile Number"
+                  className={`w-full ${
+                    errors?.editSection?.mobileNumber ? "border-red-500" : ""
+                  }`}
+                />
+                {errors?.editSection?.mobileNumber && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.editSection.mobileNumber.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-lg text-gray-800">
                   Alternative Number
                 </label>
                 <Input
-                  {...register("alternativeNumber")}
+                  {...register("editSection.alternativeNumber")}
                   placeholder="Alternative Number"
                   className={`w-full ${
-                    errors.alternativeNumber ? "border-red-500" : ""
+                    errors?.editSection?.alternativeNumber
+                      ? "border-red-500"
+                      : ""
                   }`}
                 />
-                {errors.alternativeNumber && (
+                {errors?.editSection?.alternativeNumber && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.alternativeNumber.message}
+                    {errors.editSection.alternativeNumber.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">
-                  Date of Birth
-                </label>
+                <label className="text-lg text-gray-800">Date of Birth</label>
                 <Input
-                  {...register("dateOfBirth")}
+                  {...register("editSection.dateOfBirth")}
                   type="date"
                   className={`w-full ${
-                    errors.dateOfBirth ? "border-red-500" : ""
+                    errors?.editSection?.dateOfBirth ? "border-red-500" : ""
                   }`}
                 />
-                {errors.dateOfBirth && (
+                {errors?.editSection?.dateOfBirth && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.dateOfBirth.message}
+                    {errors.editSection.dateOfBirth.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">
-                  Present Address
-                </label>
+                <label className="text-lg text-gray-800">Present Address</label>
                 <Input
-                  {...register("presentAddress")}
+                  {...register("editSection.presentAddress")}
                   placeholder="Present Address"
                   className={`w-full ${
-                    errors.presentAddress ? "border-red-500" : ""
+                    errors?.editSection?.presentAddress ? "border-red-500" : ""
                   }`}
                 />
-                {errors.presentAddress && (
+                {errors?.editSection?.presentAddress && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.presentAddress.message}
+                    {errors.editSection.presentAddress.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">
+                <label className="text-lg text-gray-800">
                   Permanent Address
                 </label>
                 <Input
-                  {...register("permanentAddress")}
+                  {...register("editSection.permanentAddress")}
                   placeholder="Permanent Address"
                   className={`w-full ${
-                    errors.permanentAddress ? "border-red-500" : ""
+                    errors?.editSection?.permanentAddress
+                      ? "border-red-500"
+                      : ""
                   }`}
                 />
-                {errors.permanentAddress && (
+                {errors?.editSection?.permanentAddress && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.permanentAddress.message}
+                    {errors.editSection.permanentAddress.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">City</label>
+                <label className="text-lg text-gray-800">City</label>
                 <Input
-                  {...register("city")}
+                  {...register("editSection.city")}
                   placeholder="City"
-                  className={`w-full ${errors.city ? "border-red-500" : ""}`}
+                  className={`w-full ${
+                    errors?.editSection?.city ? "border-red-500" : ""
+                  }`}
                 />
-                {errors.city && (
+                {errors?.editSection?.city && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.city.message}
+                    {errors.editSection.city.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">Postal Code</label>
+                <label className="text-lg text-gray-800">Postal Code</label>
                 <Input
-                  {...register("postalCode")}
+                  {...register("editSection.postalCode")}
                   placeholder="Postal Code"
                   className={`w-full ${
-                    errors.postalCode ? "border-red-500" : ""
+                    errors?.editSection?.postalCode ? "border-red-500" : ""
                   }`}
                 />
-                {errors.postalCode && (
+                {errors?.editSection?.postalCode && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.postalCode.message}
+                    {errors.editSection.postalCode.message}
                   </p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <label className="text-lg    text-gray-800">Country</label>
+                <label className="text-lg text-gray-800">Country</label>
                 <Input
-                  {...register("country")}
+                  {...register("editSection.country")}
                   placeholder="Country"
-                  className={`w-full ${errors.country ? "border-red-500" : ""}`}
+                  className={`w-full ${
+                    errors?.editSection?.country ? "border-red-500" : ""
+                  }`}
                 />
-                {errors.country && (
+                {errors?.editSection?.country && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.country.message}
+                    {errors.editSection.country.message}
                   </p>
                 )}
               </div>
             </div>
-
             <div className="flex justify-end">
               <Button
                 type="submit"
