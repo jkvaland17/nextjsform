@@ -202,16 +202,14 @@ const Home = () => {
                   control={control}
                   defaultValue=""
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      onValueChange={field.onChange}
-                      className={`w-full border-gray-300 rounded-[10px] text-gray-700 ${
-                        errors?.detailSection?.department
-                          ? "border-red-500"
-                          : ""
-                      }`}
-                    >
-                      <SelectTrigger>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger
+                        className={`w-full border-gray-300 rounded-[10px] text-gray-700 ${
+                          errors?.detailSection?.department
+                            ? "border-red-500"
+                            : ""
+                        }`}
+                      >
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
                       <SelectContent>
