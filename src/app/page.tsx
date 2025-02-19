@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { profileSchema } from "@/validations/add-profile-validation.schema";
+
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 const Home = () => {
@@ -56,11 +57,7 @@ const Home = () => {
     try {
       setIsSubmitting(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const formData = {
-        ...data,
-        profileImage,
-      };
+      const formData = { ...data, profileImage };
       console.log(formData);
       alert("Profile updated successfully");
       reset();
@@ -80,12 +77,10 @@ const Home = () => {
         alert("File size must be less than 5MB");
         return;
       }
-
       if (!file.type.startsWith("image/")) {
         alert("Please upload an image file");
         return;
       }
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImage(reader.result as string);
@@ -95,11 +90,11 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="flex space-x-8 border-b mb-8">
+        <div className="flex flex-col sm:flex-row sm:space-x-8 border-b mb-6 sm:mb-8">
           <button
-            className={`pb-2 px-4 ${
+            className={`pb-2 px-4 text-sm sm:text-base ${
               activeTab === "profile"
                 ? "border-b-2 border-blue-500 text-blue-500"
                 : ""
@@ -109,7 +104,7 @@ const Home = () => {
             Edit Profile
           </button>
           <button
-            className={`pb-2 px-4 ${
+            className={`pb-2 px-4 text-sm sm:text-base ${
               activeTab === "security"
                 ? "border-b-2 border-blue-500 text-blue-500"
                 : ""
@@ -120,24 +115,20 @@ const Home = () => {
           </button>
         </div>
 
-        <TabsContent value="profile" className="space-y-8">
+        <TabsContent value="profile" className="space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex items-center gap-6">
+            {/* Profile Image Section */}
+            <div className="flex justify-center sm:justify-start items-center gap-6 mb-6">
               <div className="relative">
-                <div className="w-32 h-32 rounded-full overflow-hidden">
-                  <Avatar className="h-32 w-32">
-                    <AvatarImage
-                      src={
-                        profileImage ||
-                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop"
-                      }
-                    />
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden">
+                  <Avatar className="h-full w-full">
+                    <AvatarImage src={profileImage} />
                     <AvatarFallback>CR</AvatarFallback>
                   </Avatar>
                 </div>
                 <label
                   htmlFor="image-upload"
-                  className="absolute -bottom-2 -right-2 bg-blue-500 p-2 rounded-full cursor-pointer"
+                  className="absolute -bottom-2 -right-2 bg-blue-500 p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors"
                 >
                   <svg
                     className="w-4 h-4 text-white"
@@ -162,39 +153,22 @@ const Home = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {/* Form fields with responsive styling */}
+              <FormField
+                label="Your Name"
+                error={errors?.editSection?.name}
+                {...register("editSection.name")}
+                placeholder="Your Name"
+              />
+              <FormField
+                label="Designation"
+                error={errors?.editSection?.designation}
+                {...register("editSection.designation")}
+                placeholder="Designation"
+              />
               <div className="space-y-2">
-                <label className="text-lg text-gray-700">Your Name</label>
-                <Input
-                  {...register("editSection.name")}
-                  placeholder="Your Name"
-                  className={`w-full ${
-                    errors?.editSection?.name ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.name.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-700">Designation</label>
-                <Input
-                  {...register("editSection.designation")}
-                  placeholder="Designation"
-                  className={`w-full ${
-                    errors?.editSection?.designation ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.designation && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.designation.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">
+                <label className="text-base sm:text-lg text-gray-800">
                   Dept./Organization
                 </label>
                 <Controller
@@ -204,7 +178,7 @@ const Home = () => {
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger
-                        className={`w-full border-gray-300 rounded-[10px] text-gray-700 ${
+                        className={`w-full border-gray-300 rounded-lg ${
                           errors?.detailSection?.department
                             ? "border-red-500"
                             : ""
@@ -221,160 +195,72 @@ const Home = () => {
                   )}
                 />
                 {errors?.detailSection?.department && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="text-red-500 text-sm">
                     {errors.detailSection.department.message}
                   </p>
                 )}
               </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">Email</label>
-                <Input
-                  {...register("detailSection.email")}
-                  type="email"
-                  placeholder="Email"
-                  className={`w-full ${
-                    errors?.detailSection?.email ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.detailSection?.email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.detailSection.email.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">Mobile Number</label>
-                <Input
-                  {...register("editSection.mobileNumber")}
-                  placeholder="Mobile Number"
-                  className={`w-full ${
-                    errors?.editSection?.mobileNumber ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.mobileNumber && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.mobileNumber.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">
-                  Alternative Number
-                </label>
-                <Input
-                  {...register("editSection.alternativeNumber")}
-                  placeholder="Alternative Number"
-                  className={`w-full ${
-                    errors?.editSection?.alternativeNumber
-                      ? "border-red-500"
-                      : ""
-                  }`}
-                />
-                {errors?.editSection?.alternativeNumber && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.alternativeNumber.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">Date of Birth</label>
-                <Input
-                  {...register("editSection.dateOfBirth")}
-                  type="date"
-                  className={`w-full ${
-                    errors?.editSection?.dateOfBirth ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.dateOfBirth && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.dateOfBirth.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">Present Address</label>
-                <Input
-                  {...register("editSection.presentAddress")}
-                  placeholder="Present Address"
-                  className={`w-full ${
-                    errors?.editSection?.presentAddress ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.presentAddress && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.presentAddress.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">
-                  Permanent Address
-                </label>
-                <Input
-                  {...register("editSection.permanentAddress")}
-                  placeholder="Permanent Address"
-                  className={`w-full ${
-                    errors?.editSection?.permanentAddress
-                      ? "border-red-500"
-                      : ""
-                  }`}
-                />
-                {errors?.editSection?.permanentAddress && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.permanentAddress.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">City</label>
-                <Input
-                  {...register("editSection.city")}
-                  placeholder="City"
-                  className={`w-full ${
-                    errors?.editSection?.city ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.city && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.city.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">Postal Code</label>
-                <Input
-                  {...register("editSection.postalCode")}
-                  placeholder="Postal Code"
-                  className={`w-full ${
-                    errors?.editSection?.postalCode ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.postalCode && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.postalCode.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-lg text-gray-800">Country</label>
-                <Input
-                  {...register("editSection.country")}
-                  placeholder="Country"
-                  className={`w-full ${
-                    errors?.editSection?.country ? "border-red-500" : ""
-                  }`}
-                />
-                {errors?.editSection?.country && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.editSection.country.message}
-                  </p>
-                )}
-              </div>
+
+              <FormField
+                label="Email"
+                error={errors?.detailSection?.email}
+                {...register("detailSection.email")}
+                type="email"
+                placeholder="Email"
+              />
+              <FormField
+                label="Mobile Number"
+                error={errors?.editSection?.mobileNumber}
+                {...register("editSection.mobileNumber")}
+                placeholder="Mobile Number"
+              />
+              <FormField
+                label="Alternative Number"
+                error={errors?.editSection?.alternativeNumber}
+                {...register("editSection.alternativeNumber")}
+                placeholder="Alternative Number"
+              />
+              <FormField
+                label="Date of Birth"
+                error={errors?.editSection?.dateOfBirth}
+                {...register("editSection.dateOfBirth")}
+                type="date"
+              />
+              <FormField
+                label="Present Address"
+                error={errors?.editSection?.presentAddress}
+                {...register("editSection.presentAddress")}
+                placeholder="Present Address"
+              />
+              <FormField
+                label="Permanent Address"
+                error={errors?.editSection?.permanentAddress}
+                {...register("editSection.permanentAddress")}
+                placeholder="Permanent Address"
+              />
+              <FormField
+                label="City"
+                error={errors?.editSection?.city}
+                {...register("editSection.city")}
+                placeholder="City"
+              />
+              <FormField
+                label="Postal Code"
+                error={errors?.editSection?.postalCode}
+                {...register("editSection.postalCode")}
+                placeholder="Postal Code"
+              />
+              <FormField
+                label="Country"
+                error={errors?.editSection?.country}
+                {...register("editSection.country")}
+                placeholder="Country"
+              />
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-center sm:justify-end pt-4">
               <Button
                 type="submit"
-                className="bg-blue-500 text-white px-8"
+                className="w-full sm:w-auto bg-blue-500 text-white px-8 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Saving..." : "Save"}
@@ -383,7 +269,7 @@ const Home = () => {
           </form>
         </TabsContent>
         <TabsContent value="security">
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-gray-500">
             Security settings will be displayed here
           </div>
         </TabsContent>
@@ -391,5 +277,24 @@ const Home = () => {
     </div>
   );
 };
+
+const FormField = ({
+  label,
+  error,
+  ...props
+}: {
+  label: string;
+  error?: any;
+  [key: string]: any;
+}) => (
+  <div className="space-y-2">
+    <label className="text-base sm:text-lg text-gray-800">{label}</label>
+    <Input
+      className={`w-full ${error ? "border-red-500" : "border-gray-300"}`}
+      {...props}
+    />
+    {error && <p className="text-red-500 text-sm">{error.message}</p>}
+  </div>
+);
 
 export default Home;
